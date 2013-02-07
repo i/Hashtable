@@ -26,7 +26,7 @@ void destroy(struct Hash_Table *);
 
 int hash(char * key);//
 void set(struct Hash_Table * table, char * key, void * data);
-void * get(struct Node * table, char * key);
+void * get(struct Hash_Table * table, char * key);
 
 
 #endif
