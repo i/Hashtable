@@ -8,9 +8,9 @@ struct Node{
     struct Node * next;
 };
 
-struct Node * new_node(char * key, void * value, struct Node * next);//
-void destroy_node(struct Node * node);//
-void destroy_list(struct Node * head);//
+struct Node * node_new(char * key, void * value);//
+void node_destroy(struct Node * node);//
+void list_destroy(struct Node * head);//
 
 
 struct Hash_Table{
@@ -21,7 +21,7 @@ struct Hash_Table{
     struct Node ** lists;
 };
 
-struct Hash_Table * create(int size, float maxload);//
+struct Hash_Table * hash_table_create(int size, float maxload);//
 void destroy(struct Hash_Table *);
 
 int hash(char * key);//

@@ -4,7 +4,7 @@
 
 #include "hash.h"
 
-struct Hash_Table * create(int size, float maxload){
+struct Hash_Table * hash_table_create(int size, float maxload){
     struct Hash_Table * table = malloc(sizeof(struct Hash_Table));
 
     table->population = 0;
@@ -16,25 +16,24 @@ struct Hash_Table * create(int size, float maxload){
     return table;
 }
 
-struct Node * new_node(char * key, void * value, struct Node * next){
+struct Node * node_new(char * key, void * value){
     struct Node * node = malloc(sizeof(struct Node));
-    node->key = malloc(sizeof(key));
-    strcpy(node->key, key);
-    node->value = malloc(sizeof(value));
-    strcpy(node->value, value);
+    node->key = strdup(key);
+    node->value = value;
     node->next = NULL;
 
     return node;
 }
 
-void destroy_node(struct Node * node){
+void node_destroy(struct Node * node){
     free(node->key);
     free(node->value);
     free(node);
+
     return;
 }
 
-void destroy_list(struct Node * node){
+void list_destroy(struct Node * node){
     struct Node * next;
 
     while(node){
@@ -66,17 +65,18 @@ void set(struct Hash_Table * table, char * key, void * value){
         }
 
         if(temp == NULL){ // didn't find a match
-            temp = new_node(key, value, table->lists[index]);
+            temp = node_new(key, value);
             table->lists[index] = temp;
             table->population++;
             return;
         }
 
-        printf("Error: shouldn't be here.");
+        printf("Error: key already in use!\n");
+        return;
     }
     table->population++;
 
-    temp = new_node(key, value, NULL);
+    temp = node_new(key, value);
     table->lists[index] = temp;
     return;
 }
@@ -113,6 +113,7 @@ int hash(char * key){
     for(i = 0; i < strlen(key); i++){
         ret = abs(ret * strlen(key) * tolower(key[i]));
     }
+
     return ret;
 }
 

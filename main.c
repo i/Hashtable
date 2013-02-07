@@ -6,12 +6,13 @@
 
 int main(int argc, char ** argv){
 
-    struct Hash_Table * table = create(15, .75);
+    struct Hash_Table * table = hash_table_create(15, .75);
 
-    set(table, "one", "one");
-    set(table, "fef", "bar");
-    printf("%s\n",get(table, "one"));
-    printf("%s\n",get(table, "fef"));
+    set(table, "foo", strdup("bar"));
+    set(table, "foo", strdup("uccclelele"));
+    set(table, "hot", strdup("dog"));
+    printf("%s\n", (char *)get(table, "hot"));
+    printf("%s\n", (char *)get(table, "foo"));
 
     return 0;
 }
