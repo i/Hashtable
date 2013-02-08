@@ -1,25 +1,29 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
+#include <ctype.h>
 
 #include "hash.h"
 
-struct Hash_Table * hash_table_create(int size, float maxload){
+struct Hash_Table * hash_table_create(int size){
     struct Hash_Table * table = malloc(sizeof(struct Hash_Table));
 
     table->population = 0;
     table->size = size;
-    table->maxload = maxload;
     table->loadfactor = 0;
-    table->lists = calloc(size, sizeof(struct Node));
+    table->lists = calloc(size, sizeof(struct Node *));
 
     return table;
 }
 
 struct Node * node_new(char * key, void * value){
     struct Node * node = malloc(sizeof(struct Node));
-    node->key = strdup(key);
+    char * temp = malloc(sizeof(key)+1);
+    node->key = strcpy(temp, key);
     node->value = value;
+    node->occur = 1;
+    node->versions = 1;
     node->next = NULL;
 
     return node;
@@ -48,42 +52,59 @@ void list_destroy(struct Node * node){
 }
 
 void set(struct Hash_Table * table, char * key, void * value){
-    struct Node * temp;
-    int index = hash(key) % table->size;
+    struct Node * temp, * curr, * prev;
+    int index;
+    index = hash_fn(key) % table->size;
 
-    if(table->lists[index]){
-        temp = table->lists[index];
-        while(temp){
-            printf("%s\n",temp->key);
-            if(strcasecmp(temp->key, key) == 0){ //found a match
-                printf("found match\n");
-                // do more things
-                //table->population++;
-                break;
+    if(table->population / table->size > table->loadfactor){
+        printf("rehashing...");
+        rehash(table);
+    }
+
+
+    temp = table->lists[index];
+
+    if(temp == NULL){
+        temp = node_new(key, value);
+        table->lists[index] = temp;
+        table->population++;
+        return;
+    }
+
+
+    while(temp){
+        if(strcasecmp(temp->key, key) == 0){
+/*            printf("found occurence\n");*/
+            temp->occur++;
+
+            curr = temp;
+            while(curr != NULL){
+                if( strcmp(curr->key, key) == 0){
+/*                    printf("existing found version\n");*/
+                    return;
+                }
+                prev = curr;
+                curr = curr->similar;
             }
-            temp = temp->next;
-        }
 
-        if(temp == NULL){ // didn't find a match
+            temp->versions++;
             temp = node_new(key, value);
-            table->lists[index] = temp;
-            table->population++;
+            prev->similar = temp;
             return;
         }
 
-        printf("Error: key already in use!\n");
-        return;
+        prev = temp;
+        temp = temp->next;
     }
-    table->population++;
-
-    temp = node_new(key, value);
-    table->lists[index] = temp;
-    return;
+        temp = node_new(key, value);
+        prev->next = temp;
+        table->population++;
+        return;
 }
 
 void * get(struct Hash_Table * table, char * key){
 
-    int index = hash(key) % table->size;
+    int index = hash_fn(key) % table->size;
     struct Node * ptr;
     if(table == NULL){
         printf("Error: no table!\n");
@@ -106,8 +127,8 @@ void * get(struct Hash_Table * table, char * key){
 }
 
 
-int hash(char * key){
-    int ret, i;
+size_t hash_fn(char * key){
+    size_t ret, i;
     ret = 2113;
 
     for(i = 0; i < strlen(key); i++){
@@ -118,5 +139,30 @@ int hash(char * key){
 }
 
 
+void rehash(struct Hash_Table * table){
+    struct Node * curr, * curr2;
+    struct Node ** placeholder = table->lists;
+    struct Node ** newlists = calloc((table->size * 2), sizeof(struct Node *));
+    int i;
 
+    table->size = table->size * 2;
+    table->lists = newlists;
+
+    for(i=0; i < sizeof(placeholder); i++){
+        curr = placeholder[i];
+        while(curr){
+            curr2 = table->lists[hash_fn(curr->key) % table->size];
+            if(curr2 == NULL){
+                    curr2 = curr;
+            }
+            else{
+                curr->next = curr2;
+                table->lists[hash_fn(curr->key) % table->size] = curr;
+            }
+            curr = curr->next;
+        }
+    }
+
+    return;
+}
 

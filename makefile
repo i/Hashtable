@@ -1,9 +1,16 @@
-all: hash main
-	gcc -o test hash.o main.o -pedantic -ansi -Wall -Werror
-	./test
+FILES=hash.c wordstat.c
+CFLAGS=-ansi -pedantic -Wall -Werror
 
-hash:
-	gcc -c -o hash.o hash.c
+.PHONY: debug all
 
-main:
-	gcc -c -o main.o main.c
+all:
+	gcc $(FILES) $(CFLAGS) -o test
+	./test l.txt
+
+debug:
+	gcc $(FILES) $(CFLAGS) -g -o test
+
+clean:
+	rm wordstat.o
+	rm hash.o
+	rm test
