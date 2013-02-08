@@ -166,3 +166,26 @@ void rehash(struct Hash_Table * table){
     return;
 }
 
+struct Node ** get_sorted(struct Hash_Table * table){
+    struct Node ** ret = calloc(table->population, sizeof(struct Node*));
+    struct Node * curr;
+    int i, j = 0;
+
+    for(i=0; i < table->size; i++){
+        curr = table->lists[i];
+        while(curr){
+            ret[j] = curr;
+            j++;
+        }
+    }
+
+    printf("printing unsorted:\n");
+    for(i = 0; i < sizeof(ret); i++){
+        printf("%s\n",ret[i]->key);
+    }
+    return ret;
+}
+
+
+
+

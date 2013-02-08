@@ -7,7 +7,7 @@
 #include "hash.h"
 
 int main(int argc, char ** argv){
-    struct Hash_Table * table = hash_table_create(1024);
+    struct Hash_Table * table = hash_table_create(35);
     FILE * input;
     int i, wc = 0;
     char character;
@@ -59,6 +59,6 @@ int main(int argc, char ** argv){
             currnode = currnode->next;
         }
     }
-rehash(table);
+    get_sorted(table);
     return 0;
 }
