@@ -59,6 +59,6 @@ int main(int argc, char ** argv){
             currnode = currnode->next;
         }
     }
-    get_sorted(table);
+    get_all_entries(table);
     return 0;
 }

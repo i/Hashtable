@@ -17,7 +17,7 @@ void list_destroy(struct Node * head);
 struct Hash_Table{
     int size;
     int population;
-    float loadfactor;
+    double loadfactor;
     struct Node ** lists;
 };
 
@@ -28,6 +28,9 @@ size_t hash_fn(char * key);
 void set(struct Hash_Table * table, char * key, void * data);
 void * get(struct Hash_Table * table, char * key);
 void rehash(struct Hash_Table * table);
+struct Node ** get_all_entries(struct Hash_Table * table);
 struct Node ** get_sorted(struct Hash_Table * table);
+
+struct Node ** quicksort(struct Node ** ary);
 
 #endif
