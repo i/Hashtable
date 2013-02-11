@@ -31,6 +31,5 @@ void rehash(struct Hash_Table * table);
 struct Node ** get_all_entries(struct Hash_Table * table);
 struct Node ** get_sorted(struct Hash_Table * table);
 
-struct Node ** quicksort(struct Node ** ary);
-
+char * wordtolower(char * word);
 #endif

@@ -184,10 +184,10 @@ struct Node ** get_all_entries(struct Hash_Table * table){
     return ret;
 }
 
-
-struct Node ** quicksort(struct Node * ary[]){
-    if(sizeof(ary)/sizeof(struct Node*) <= 1){
-        return ary;
+char * wordtolower(char * word){
+    int i;
+    for(i = 0; i < sizeof(word)/sizeof(char); i++){
+        word[i] = tolower(word[i]);
     }
-    return ary;
+    return word;
 }

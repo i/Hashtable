@@ -1,4 +1,4 @@
-FILES=hash.c wordstat.c
+FILES=hash.c quicksort.c wordstat.c
 CFLAGS=-ansi -pedantic -Wall -Werror
 
 .PHONY: debug all
@@ -12,5 +12,6 @@ debug:
 
 clean:
 	rm wordstat.o
+	rm quicksort.o
 	rm hash.o
 	rm test

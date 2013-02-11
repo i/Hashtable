@@ -5,6 +5,7 @@
 #include <ctype.h>
 
 #include "hash.h"
+#include "quicksort.h"
 
 int main(int argc, char ** argv){
     struct Hash_Table * table = hash_table_create(35);
@@ -12,7 +13,7 @@ int main(int argc, char ** argv){
     int i, wc = 0;
     char character;
     char * buffer ;
-    struct Node * currnode;
+    struct Node * currnode, ** ary;
 
     if(argc != 2){
         printf("Error. Do you need help?\n");
@@ -55,10 +56,16 @@ int main(int argc, char ** argv){
     for(i = 0; i < table->size; i++){
         currnode = table->lists[i];
         while(currnode){
-            printf("%s\to: %d\tv: %d\n",currnode->key, currnode->occur, currnode->versions);
+            printf("%s\to: %d\tv: %d\n", wordtolower(currnode->key), currnode->occur, currnode->versions);
             currnode = currnode->next;
         }
     }
-    get_all_entries(table);
+    ary =  get_all_entries(table);
+
+    for(i=0; i<table->population; i++){
+        if(ary[i*sizeof(struct Node*)])
+        printf("%s\n", ary[i*sizeof(struct Node *)]->key);
+    }
+
     return 0;
 }
