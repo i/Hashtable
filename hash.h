@@ -11,6 +11,7 @@ struct Node{
 
 struct Node * node_new(char * key, void * value);
 void node_destroy(struct Node * node);
+void sim_destroy(struct Node * node);
 void list_destroy(struct Node * head);
 
 
@@ -22,7 +23,7 @@ struct Hash_Table{
 };
 
 struct Hash_Table * hash_table_create(int size);
-void destroy(struct Hash_Table *);
+void table_destroy(struct Hash_Table *);
 
 size_t hash_fn(char * key);
 void set(struct Hash_Table * table, char * key, void * data);
@@ -32,4 +33,5 @@ struct Node ** get_all_entries(struct Hash_Table * table);
 struct Node ** get_sorted(struct Hash_Table * table);
 
 char * wordtolower(char * word);
+int cmpstringp(const void *p1, const void *p2);
 #endif

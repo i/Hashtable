@@ -11,10 +11,20 @@ struct Hash_Table * hash_table_create(int size){
 
     table->population = 0;
     table->size = size;
-    table->loadfactor = 0;
+    table->loadfactor = .75;
     table->lists = calloc(size, sizeof(struct Node *));
 
     return table;
+}
+
+void table_destroy(struct Hash_Table * table){
+    int i;
+
+    for(i = 0; i < table->size; i++){
+        list_destroy(table->lists[i]);printf("%d",i);
+    }
+    free(table);
+    return;
 }
 
 struct Node * node_new(char * key, void * value){
@@ -29,25 +39,32 @@ struct Node * node_new(char * key, void * value){
     return node;
 }
 
-void node_destroy(struct Node * node){
-    free(node->key);
-    free(node->value);
-    free(node);
-
-    return;
-}
 
 void list_destroy(struct Node * node){
     struct Node * next;
-
+    
     while(node){
+        if(node->similar){
+            sim_destroy(node->similar);
+        }
         next = node->next;
         free(node->key);
         free(node->value);
         free(node);
         node = next;
     }
+    return;
+}
 
+void sim_destroy(struct Node * node){
+    struct Node * next;
+    while(node->similar){
+        next = node->similar;
+        free(node->similar);
+        free(node->value);
+        free(node);
+        node = next;
+    }
     return;
 }
 
@@ -57,10 +74,8 @@ void set(struct Hash_Table * table, char * key, void * value){
     index = hash_fn(key) % table->size;
 
     if(table->population / table->size > table->loadfactor){
-        printf("rehashing...");
         rehash(table);
     }
-
 
     temp = table->lists[index];
 
@@ -71,12 +86,10 @@ void set(struct Hash_Table * table, char * key, void * value){
         return;
     }
 
-
     while(temp){
         if(strcasecmp(temp->key, key) == 0){
 /*            printf("found occurence\n");*/
             temp->occur++;
-
             curr = temp;
             while(curr != NULL){
                 if( strcmp(curr->key, key) == 0){
@@ -103,7 +116,6 @@ void set(struct Hash_Table * table, char * key, void * value){
 }
 
 void * get(struct Hash_Table * table, char * key){
-
     int index = hash_fn(key) % table->size;
     struct Node * ptr;
     if(table == NULL){
@@ -132,38 +144,34 @@ size_t hash_fn(char * key){
     ret = 2113;
 
     for(i = 0; i < strlen(key); i++){
-        ret = abs(ret * strlen(key) * tolower(key[i]));
+        ret = abs(ret * tolower(key[i]));
     }
 
     return ret;
 }
 
 
-void rehash(struct Hash_Table * table){
-    struct Node * curr, * curr2;
-    struct Node ** placeholder = table->lists;
-    struct Node ** newlists = calloc((table->size * 2), sizeof(struct Node *));
+struct Hash_Table * rehash(struct Hash_Table * table){
+    struct Hash_Table * newtable;
+    struct Node * curr, * prev, * sim, * temp;
     int i;
 
-    table->size = table->size * 2;
-    table->lists = newlists;
-
-    for(i=0; i < sizeof(placeholder); i++){
-        curr = placeholder[i];
+    newtable = hash_table_create(table->size*2);
+    for(i=0; i<table->size; i++){
+        curr = table[i];
         while(curr){
-            curr2 = table->lists[hash_fn(curr->key) % table->size];
-            if(curr2 == NULL){
-                    curr2 = curr;
+            set(newtable, curr->key, 0);
+            if(sim = (curr->similar)){
+                while(sim){
+                    
+                }
             }
-            else{
-                curr->next = curr2;
-                table->lists[hash_fn(curr->key) % table->size] = curr;
-            }
-            curr = curr->next;
         }
     }
 
-    return;
+
+    table_destroy(table);
+    return newtable;
 }
 
 /*returns an array of pointers to everything in hash table */
@@ -176,8 +184,8 @@ struct Node ** get_all_entries(struct Hash_Table * table){
         curr = table->lists[i];
         while(curr != NULL){
             ret[j] = curr;
-            printf("%s\t%i\n", ret[j]->key,j);
-            j += sizeof(struct Node *);
+/*            printf("%s\t%i\n", ret[j]->key,j);*/
+            j++;
             curr = curr->next;
         }
     }
@@ -190,4 +198,10 @@ char * wordtolower(char * word){
         word[i] = tolower(word[i]);
     }
     return word;
+}
+
+
+
+int cmpstringp(const void *p1, const void *p2){
+    return strcasecmp(* (char * const *)((struct Node *) p1)->key, * (char * const *) ((struct Node *)p2)->key);
 }

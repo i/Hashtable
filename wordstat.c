@@ -8,7 +8,7 @@
 #include "quicksort.h"
 
 int main(int argc, char ** argv){
-    struct Hash_Table * table = hash_table_create(35);
+    struct Hash_Table * table = hash_table_create(20);
     FILE * input;
     int i, wc = 0;
     char character;
@@ -52,20 +52,22 @@ int main(int argc, char ** argv){
             wc = 0;
         }
     }
+    if (buffer[0] != '\0')
+        set(table, buffer, 0);
+    free(buffer);
 
-    for(i = 0; i < table->size; i++){
-        currnode = table->lists[i];
-        while(currnode){
-            printf("%s\to: %d\tv: %d\n", wordtolower(currnode->key), currnode->occur, currnode->versions);
-            currnode = currnode->next;
-        }
-    }
     ary =  get_all_entries(table);
+    qsort(ary, table->population, sizeof(struct Node *), cmpstringp);
 
+    printf("-------------------------\n");
     for(i=0; i<table->population; i++){
-        if(ary[i*sizeof(struct Node*)])
-        printf("%s\n", ary[i*sizeof(struct Node *)]->key);
+        currnode = (ary[i]);
+        if(currnode)
+            printf("%s\t%d\t%d\n", wordtolower(currnode->key),
+                    currnode->occur, currnode->versions);
     }
 
+    table_destroy(table);
+    free(ary);
     return 0;
 }
